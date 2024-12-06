@@ -15,29 +15,19 @@ const Index = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simuliere API-Aufruf
-    if (isLogin) {
-      // Login-Logik
-      if (formData.username && formData.password) {
-        toast.success("Erfolgreich angemeldet!");
-        navigate("/verify");
-      } else {
-        toast.error("Bitte alle Felder ausfüllen!");
-      }
-    } else {
-      // Registrierungs-Logik
-      if (formData.username && formData.password) {
-        toast.success("Registrierung erfolgreich!");
-        navigate("/verify");
-      } else {
-        toast.error("Bitte alle Felder ausfüllen!");
-      }
+    if (!formData.username || !formData.password) {
+      toast.error("Bitte alle Felder ausfüllen!");
+      return;
     }
+
+    // Simuliere erfolgreiche Anmeldung/Registrierung
+    toast.success(isLogin ? "Erfolgreich angemeldet!" : "Registrierung erfolgreich!");
+    navigate("/verify");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 animate-fadeIn">
+      <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-whatsapp-dark">ChatApp</h1>
           <p className="mt-2 text-gray-600">
@@ -54,7 +44,6 @@ const Index = () => {
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
               }
-              className="w-full"
             />
             <Input
               type="password"
@@ -63,7 +52,6 @@ const Index = () => {
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
-              className="w-full"
             />
           </div>
 

@@ -1,14 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Menu, ArrowLeft, Send } from "lucide-react";
+import { PlusCircle, Send } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import ChatHeader from "@/components/chat/ChatHeader";
+import ChatList from "@/components/chat/ChatList";
+import AddContactDialog from "@/components/chat/AddContactDialog";
 
 interface Message {
   id: number;
@@ -24,29 +21,20 @@ interface Chat {
 }
 
 const Chat = () => {
-  const navigate = useNavigate();
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [newMessage, setNewMessage] = useState("");
-  const [newContactName, setNewContactName] = useState("");
-  const [newContactCode, setNewContactCode] = useState("");
+  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
   const personalCode = "USER" + Math.floor(100000 + Math.random() * 900000).toString();
 
-  const addContact = () => {
-    if (!newContactName.trim() || !newContactCode.trim()) {
-      toast.error("Bitte füllen Sie alle Felder aus!");
-      return;
-    }
-
+  const addContact = (name: string, code: string) => {
     const newChat: Chat = {
       id: Date.now(),
-      name: newContactName,
+      name: name,
       messages: [],
     };
 
     setChats([...chats, newChat]);
-    setNewContactName("");
-    setNewContactCode("");
     toast.success("Kontakt hinzugefügt!");
   };
 
@@ -73,59 +61,19 @@ const Chat = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <div className="w-1/4 bg-white border-r border-gray-200 p-4">
-        <div className="flex justify-between items-center mb-4">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="p-2 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Ihr persönlicher Code:</p>
-                <p className="text-lg font-bold text-whatsapp-dark">{personalCode}</p>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-2">
-          {chats.map((chat) => (
-            <div
-              key={chat.id}
-              onClick={() => setSelectedChat(chat)}
-              className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                selectedChat?.id === chat.id
-                  ? "bg-whatsapp-light"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              <h3 className="font-medium">{chat.name}</h3>
-              {chat.messages.length > 0 && (
-                <p className="text-sm text-gray-500 truncate">
-                  {chat.messages[chat.messages.length - 1].text}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
+        <ChatHeader selectedChat={null} personalCode={personalCode} />
+        <ChatList 
+          chats={chats} 
+          selectedChat={selectedChat} 
+          onSelectChat={setSelectedChat} 
+        />
       </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col relative">
+      <div className="flex-1 flex flex-col">
         {selectedChat ? (
           <>
-            <div className="bg-white p-4 border-b border-gray-200">
-              <h2 className="font-semibold">{selectedChat.name}</h2>
-            </div>
+            <ChatHeader selectedChat={selectedChat} personalCode={personalCode} />
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {selectedChat.messages.map((message) => (
@@ -158,9 +106,8 @@ const Chat = () => {
                   placeholder="Nachricht schreiben..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-1"
                 />
-                <Button type="submit" size="icon" className="bg-whatsapp-primary hover:bg-whatsapp-dark">
+                <Button type="submit" size="icon">
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
@@ -172,40 +119,19 @@ const Chat = () => {
           </div>
         )}
 
-        {/* Add Contact Button and Popup */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              className="absolute bottom-4 right-4 rounded-full bg-whatsapp-primary hover:bg-whatsapp-dark"
-              size="icon"
-            >
-              <PlusCircle className="h-6 w-6" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="space-y-4">
-              <h3 className="font-semibold">Neuen Kontakt hinzufügen</h3>
-              <Input
-                type="text"
-                placeholder="Benutzername"
-                value={newContactName}
-                onChange={(e) => setNewContactName(e.target.value)}
-              />
-              <Input
-                type="text"
-                placeholder="Benutzercode"
-                value={newContactCode}
-                onChange={(e) => setNewContactCode(e.target.value)}
-              />
-              <Button
-                onClick={addContact}
-                className="w-full bg-whatsapp-primary hover:bg-whatsapp-dark"
-              >
-                Hinzufügen
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <Button
+          onClick={() => setIsAddContactOpen(true)}
+          className="absolute bottom-4 right-4 rounded-full"
+          size="icon"
+        >
+          <PlusCircle className="h-6 w-6" />
+        </Button>
+
+        <AddContactDialog
+          isOpen={isAddContactOpen}
+          onClose={() => setIsAddContactOpen(false)}
+          onAddContact={addContact}
+        />
       </div>
     </div>
   );

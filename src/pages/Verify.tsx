@@ -19,11 +19,12 @@ const Verify = () => {
       return;
     }
     
+    // Hier würde normalerweise der E-Mail-Versand über Supabase erfolgen
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     setVerificationCode(generatedCode);
     setIsEmailSent(true);
     toast.success(`Verifizierungscode wurde an ${email} gesendet`);
-    console.log("Verifizierungscode:", generatedCode);
+    console.log("Verifizierungscode:", generatedCode); // Für Testzwecke
   };
 
   const handleVerify = (e: React.FormEvent) => {
@@ -38,7 +39,7 @@ const Verify = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 animate-fadeIn">
+      <div className="w-full max-w-md space-y-8">
         <div className="relative w-full">
           <button 
             onClick={() => navigate(-1)} 
@@ -47,7 +48,7 @@ const Verify = () => {
             <ArrowLeft className="h-6 w-6" />
           </button>
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-whatsapp-dark">WhatsApp</h1>
+            <h1 className="text-4xl font-bold text-whatsapp-dark">ChatApp</h1>
             {!isEmailSent ? (
               <p className="mt-2 text-gray-600">
                 Geben Sie Ihre E-Mail-Adresse ein, um sich zu verifizieren
