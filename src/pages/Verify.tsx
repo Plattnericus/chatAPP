@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Mail, Check } from "lucide-react";
+import { Mail, Check, ArrowLeft } from "lucide-react";
 
 const Verify = () => {
   const navigate = useNavigate();
@@ -19,12 +19,10 @@ const Verify = () => {
       return;
     }
     
-    // Simuliere E-Mail-Versand
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     setVerificationCode(generatedCode);
     setIsEmailSent(true);
     toast.success(`Verifizierungscode wurde an ${email} gesendet`);
-    // In einer echten Anwendung würde hier die E-Mail über das Backend versendet
     console.log("Verifizierungscode:", generatedCode);
   };
 
@@ -41,17 +39,25 @@ const Verify = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md space-y-8 animate-fadeIn">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-whatsapp-dark">WhatsApp</h1>
-          {!isEmailSent ? (
-            <p className="mt-2 text-gray-600">
-              Geben Sie Ihre E-Mail-Adresse ein, um sich zu verifizieren
-            </p>
-          ) : (
-            <p className="mt-2 text-gray-600">
-              Geben Sie den Code ein, den Sie per E-Mail erhalten haben
-            </p>
-          )}
+        <div className="relative w-full">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="absolute left-0 top-0 p-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-whatsapp-dark">WhatsApp</h1>
+            {!isEmailSent ? (
+              <p className="mt-2 text-gray-600">
+                Geben Sie Ihre E-Mail-Adresse ein, um sich zu verifizieren
+              </p>
+            ) : (
+              <p className="mt-2 text-gray-600">
+                Geben Sie den Code ein, den Sie per E-Mail erhalten haben
+              </p>
+            )}
+          </div>
         </div>
 
         {!isEmailSent ? (

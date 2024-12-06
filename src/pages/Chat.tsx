@@ -1,8 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Send } from "lucide-react";
+import { PlusCircle, Menu, ArrowLeft, Send } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Message {
   id: number;
@@ -18,26 +24,30 @@ interface Chat {
 }
 
 const Chat = () => {
+  const navigate = useNavigate();
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [newMessage, setNewMessage] = useState("");
-  const [newChatName, setNewChatName] = useState("");
+  const [newContactName, setNewContactName] = useState("");
+  const [newContactCode, setNewContactCode] = useState("");
+  const personalCode = "USER" + Math.floor(100000 + Math.random() * 900000).toString();
 
-  const addChat = () => {
-    if (!newChatName.trim()) {
-      toast.error("Bitte gib einen Chat-Namen ein!");
+  const addContact = () => {
+    if (!newContactName.trim() || !newContactCode.trim()) {
+      toast.error("Bitte füllen Sie alle Felder aus!");
       return;
     }
 
     const newChat: Chat = {
       id: Date.now(),
-      name: newChatName,
+      name: newContactName,
       messages: [],
     };
 
     setChats([...chats, newChat]);
-    setNewChatName("");
-    toast.success("Chat erstellt!");
+    setNewContactName("");
+    setNewContactCode("");
+    toast.success("Kontakt hinzugefügt!");
   };
 
   const sendMessage = (e: React.FormEvent) => {
@@ -65,18 +75,26 @@ const Chat = () => {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-1/4 bg-white border-r border-gray-200 p-4">
-        <div className="mb-4">
-          <div className="flex space-x-2">
-            <Input
-              type="text"
-              placeholder="Neuer Chat"
-              value={newChatName}
-              onChange={(e) => setNewChatName(e.target.value)}
-            />
-            <Button onClick={addChat} size="icon">
-              <PlusCircle className="h-4 w-4" />
-            </Button>
-          </div>
+        <div className="flex justify-between items-center mb-4">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56">
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Ihr persönlicher Code:</p>
+                <p className="text-lg font-bold text-whatsapp-dark">{personalCode}</p>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="space-y-2">
@@ -102,15 +120,13 @@ const Chat = () => {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative">
         {selectedChat ? (
           <>
-            {/* Chat Header */}
             <div className="bg-white p-4 border-b border-gray-200">
               <h2 className="font-semibold">{selectedChat.name}</h2>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {selectedChat.messages.map((message) => (
                 <div
@@ -135,7 +151,6 @@ const Chat = () => {
               ))}
             </div>
 
-            {/* Message Input */}
             <form onSubmit={sendMessage} className="bg-white p-4 border-t border-gray-200">
               <div className="flex space-x-2">
                 <Input
@@ -153,9 +168,44 @@ const Chat = () => {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-500">
-            Wähle einen Chat aus oder erstelle einen neuen Chat
+            Wähle einen Chat aus oder füge einen neuen Kontakt hinzu
           </div>
         )}
+
+        {/* Add Contact Button and Popup */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              className="absolute bottom-4 right-4 rounded-full bg-whatsapp-primary hover:bg-whatsapp-dark"
+              size="icon"
+            >
+              <PlusCircle className="h-6 w-6" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="space-y-4">
+              <h3 className="font-semibold">Neuen Kontakt hinzufügen</h3>
+              <Input
+                type="text"
+                placeholder="Benutzername"
+                value={newContactName}
+                onChange={(e) => setNewContactName(e.target.value)}
+              />
+              <Input
+                type="text"
+                placeholder="Benutzercode"
+                value={newContactCode}
+                onChange={(e) => setNewContactCode(e.target.value)}
+              />
+              <Button
+                onClick={addContact}
+                className="w-full bg-whatsapp-primary hover:bg-whatsapp-dark"
+              >
+                Hinzufügen
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
