@@ -23,11 +23,11 @@ export default {
         "whatsapp-dark": "#128C7E",
         "whatsapp-light": "#DCF8C6",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "#25D366",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "#128C7E",
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -39,7 +39,7 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
+          DEFAULT: "#DCF8C6",
           foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
