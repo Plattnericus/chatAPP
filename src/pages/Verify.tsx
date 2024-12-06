@@ -3,26 +3,38 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Mail, Check } from "lucide-react";
 
 const Verify = () => {
   const navigate = useNavigate();
-  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
+  const [inputCode, setInputCode] = useState("");
+  const [isEmailSent, setIsEmailSent] = useState(false);
 
-  useEffect(() => {
-    // Generiere 6-stelligen Code
+  const handleSendEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes("@")) {
+      toast.error("Bitte geben Sie eine gültige E-Mail-Adresse ein");
+      return;
+    }
+    
+    // Simuliere E-Mail-Versand
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     setVerificationCode(generatedCode);
-    toast.info(`Dein Verifizierungscode: ${generatedCode}`);
-  }, []);
+    setIsEmailSent(true);
+    toast.success(`Verifizierungscode wurde an ${email} gesendet`);
+    // In einer echten Anwendung würde hier die E-Mail über das Backend versendet
+    console.log("Verifizierungscode:", generatedCode);
+  };
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === verificationCode) {
-      toast.success("Erfolgreich verifiziert!");
+    if (inputCode === verificationCode) {
+      toast.success("E-Mail erfolgreich verifiziert!");
       navigate("/chat");
     } else {
-      toast.error("Falscher Code!");
+      toast.error("Falscher Verifizierungscode!");
     }
   };
 
@@ -30,26 +42,60 @@ const Verify = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md space-y-8 animate-fadeIn">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-whatsapp-dark">Verifizierung</h1>
-          <p className="mt-2 text-gray-600">
-            Gib den 6-stelligen Code ein, den du erhalten hast
-          </p>
+          <h1 className="text-4xl font-bold text-whatsapp-dark">WhatsApp</h1>
+          {!isEmailSent ? (
+            <p className="mt-2 text-gray-600">
+              Geben Sie Ihre E-Mail-Adresse ein, um sich zu verifizieren
+            </p>
+          ) : (
+            <p className="mt-2 text-gray-600">
+              Geben Sie den Code ein, den Sie per E-Mail erhalten haben
+            </p>
+          )}
         </div>
 
-        <form onSubmit={handleVerify} className="mt-8 space-y-6">
-          <Input
-            type="text"
-            placeholder="Verifizierungscode"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            maxLength={6}
-            className="w-full text-center text-2xl tracking-widest"
-          />
+        {!isEmailSent ? (
+          <form onSubmit={handleSendEmail} className="mt-8 space-y-6">
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Input
+                type="email"
+                placeholder="E-Mail-Adresse"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
-          <Button type="submit" className="w-full bg-whatsapp-primary hover:bg-whatsapp-dark">
-            Verifizieren
-          </Button>
-        </form>
+            <Button 
+              type="submit" 
+              className="w-full bg-whatsapp-primary hover:bg-whatsapp-dark"
+            >
+              Code senden
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerify} className="mt-8 space-y-6">
+            <div className="relative">
+              <Check className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Verifizierungscode"
+                value={inputCode}
+                onChange={(e) => setInputCode(e.target.value)}
+                maxLength={6}
+                className="pl-10 text-center text-2xl tracking-widest"
+              />
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full bg-whatsapp-primary hover:bg-whatsapp-dark"
+            >
+              Verifizieren
+            </Button>
+          </form>
+        )}
       </div>
     </div>
   );
